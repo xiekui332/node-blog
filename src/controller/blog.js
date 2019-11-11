@@ -10,34 +10,56 @@ const getList = (author, keywords) => {
      }
 
      // 列表一般倒序
-     sql += `and order by createtime desc;`
+     sql += `order by createtime desc`
 
      // 返回的是promise
      return exec(sql)
 }
 
 const getDetail = (id) => {
-    return {
-        id:1,
-        title:'标题A',
-        content:'内容A',
-        createTime:1572511246065,
-        author:'xiekui'
-    }
+    let sql = `select * from blogs where id='${id}'`
+    return exec(sql).then(rows => {
+        return rows[0]
+    })
 }
 
-const newBlog = (postData = {}) => {
-    return {
-        id:3
-    }
+const newBlog = (blogData = {}) => {
+    let title = blogData.title
+    let content = blogData.content
+    let createtime = blogData.createtime
+    let author = blogData.author
+    let sql = `insert into blogs (title, content, createtime, author) values ('${title}', '${content}', '${createtime}', '${author}');`
+
+    return exec(sql).then(insertData => {
+        return {
+            id:insertData.insertId
+        }
+    })
 }
 
-const updateBlog = (id, postData = {}) => {
-    return true
+const updateBlog = (blogData = {}) => {
+    let id = blogData.id
+    let title = blogData.title
+    let content = blogData.content
+    let sql = `UPDATE blogs SET title='${title}', content='${content}' WHERE id='${id}';`
+    return exec(sql).then(updateData => {
+        // console.log(updateData)
+        if(updateData.affectedRows > 0) {
+            return true
+        }
+        return false
+    })
 }
 
-const delBlog = (id) => {
-    return true
+const delBlog = (id, delData = {}) => {
+    const author = delData.author
+    let sql = `DELETE FROM blogs WHERE id='${id}' and author='${author}';`
+    return exec(sql).then(delData => {
+        if(delData.affectedRows > 0) {
+            return true
+        }
+        return false
+    })
 }
 
 module.exports = {
