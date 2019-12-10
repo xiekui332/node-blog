@@ -17,14 +17,14 @@ class BaseModel {
     }
 }
 
-class SuccessModele extends BaseModel {     // extends继承父类
+class SuccessModel extends BaseModel {     // extends继承父类
     constructor(data, message) {
         super(data, message)                // 执行父类的constructor
         this.errno = 0
     }
 }
 
-class ErrorModele extends BaseModel {     // extends继承父类
+class ErrorModel extends BaseModel {     // extends继承父类
     constructor(data, message) {
         super(data, message)              // 执行父类的constructor
         this.errno = -1
@@ -32,6 +32,6 @@ class ErrorModele extends BaseModel {     // extends继承父类
 }
 
 module.exports = {
-    SuccessModele,
-    ErrorModele
+    SuccessModel,
+    ErrorModel
 }

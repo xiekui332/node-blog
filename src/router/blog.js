@@ -6,7 +6,15 @@ const {
     delBlog
 } = require('../controller/blog')
 
-const { SuccessModele, ErrorModele } = require('../model/resModel')
+const { SuccessModel, ErrorModel } = require('../model/resModel')
+
+const loginCheck = (req) => {
+    if(!req.session.username) {
+        return Promise.resolve(
+            new ErrorModel('尚未登录')
+        )
+    }
+}
 
 const handleBlogRouter = (req, res) => {
     const method = req.method
@@ -20,7 +28,7 @@ const handleBlogRouter = (req, res) => {
 
         return result.then((listData) => {
             if(listData) {
-                return  new SuccessModele(listData)
+                return  new SuccessModel(listData)
             }
         })
         return
@@ -30,40 +38,56 @@ const handleBlogRouter = (req, res) => {
         
         const result = getDetail(id)
         return result.then(data => {
-            return new SuccessModele(data)
+            return new SuccessModel(data)
         })
         
     }
 
     if(method === "POST" && req.path === "/api/blog/new") {
-        req.body.author = '谢奎'
+        const loginCheckResult = loginCheck(req)
+        if(loginCheckResult) {
+            return loginCheck
+        }
+
+        req.body.author = req.session.username
         req.body.createtime = Date.now()
         const result = newBlog(req.body)
         return result.then(data => {
-            return new SuccessModele(data)
+            return new SuccessModel(data)
         })
         
     }
 
     if(method === "POST" && req.path === "/api/blog/update") {
+        const loginCheckResult = loginCheck(req)
+        if(loginCheckResult) {
+            return loginCheck
+        }
+
         const result = updateBlog(req.body)
         return result.then(data => {
             if(data) {
-                return new SuccessModele(data)
+                return new SuccessModel(data)
             }else{
-                return new ErrorModele('更新博客失败')
+                return new ErrorModel('更新博客失败')
             }
         })
         
     }
 
     if(method === "POST" && req.path === "/api/blog/del") {
-        const result = delBlog(id, req.body)
+        const loginCheckResult = loginCheck(req)
+        if(loginCheckResult) {
+            return loginCheck
+        }
+
+        const author = req.session.username
+        const result = delBlog(id, author)
         return result.then(delData => {
             if(delData) {
-                return new SuccessModele(delData)
+                return new SuccessModel(delData)
             }else{
-                return new ErrorModele('删除博客失败')
+                return new ErrorModel('删除博客失败')
             }
         })
         
